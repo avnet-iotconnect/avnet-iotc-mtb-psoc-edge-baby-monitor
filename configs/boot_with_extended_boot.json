@@ -1,0 +1,72 @@
+{
+    "schema-version": 1.0,
+    "content":
+    [
+        {
+            "name": "metadata_proj_cm33_s",
+            "enabled" : true,
+            "commands" : 
+            [
+                {
+                    "command" : "sign",
+                    "inputs" : 
+                    [
+                        {
+                            "file" : "../build/project_hex/proj_cm33_s.hex",
+                            "header-size": "0x400",
+                            "fill-value" : "0xff",
+                            "slot-size" : "0x80000",
+                            "hex-address" : "0x70100000"
+                        }
+                    ],
+                    "outputs": 
+                    [
+                        {
+                            "file" : "../build/project_hex/proj_cm33_s_signed.hex",
+                            "format": "ihex"
+                        }
+                    ],
+                    "extra_config": 
+                    [
+                        {
+                            "project": "proj_cm33_s",
+                            "debug_config_name" : "proj_cm33_s",
+                            "default":false,
+                            "build_dependency" : "project"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "merge",
+            "enabled": true,
+            "commands" :
+            [
+                {
+                    "command" : "merge",
+                    "inputs" :
+                    [
+                        {
+                            "file" : "../build/project_hex/proj_cm33_s_signed.hex"
+                        },
+                        {
+                            "file" : "../build/project_hex/proj_cm33_ns.hex"
+                        },
+                        {
+                            "file" : "../build/project_hex/proj_cm55.hex"
+                        }
+                    ],
+                    "outputs" :
+                    [
+                        {
+                            "file" : "../build/app_combined.hex",
+                            "format" : "ihex",
+                            "overlap" : "ignore"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

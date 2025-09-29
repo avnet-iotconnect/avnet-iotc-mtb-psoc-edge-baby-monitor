@@ -116,10 +116,7 @@ static void cm55_ml_deepcraft_init(void);
 static void cm55_task(void * arg)
 {
     CY_UNUSED_PARAMETER(arg);
-    
-    //ipc
-    cy_en_ipc_pipe_status_t pipeStatus;
-        
+            
     cm55_msg_data.client_id = CM33_IPC_PIPE_CLIENT_ID;
     cm55_msg_data.intr_mask = CY_IPC_CYPIPE_INTR_MASK_EP2;
     cm55_msg_data.cmd = IPC_CMD_INIT;
@@ -132,7 +129,7 @@ static void cm55_task(void * arg)
 		if(data_refresh_flag) {
         	//printf("\n..........ai data is %d.\n\n", audio_data);
             cm55_msg_data.value = cry_detect;
-            pipeStatus = Cy_IPC_Pipe_SendMessage(CM33_IPC_PIPE_EP_ADDR, 
+            Cy_IPC_Pipe_SendMessage(CM33_IPC_PIPE_EP_ADDR, 
                                          CM55_IPC_PIPE_EP_ADDR, 
                                          (void *) &cm55_msg_data, 0);
             data_refresh_flag = 0;
@@ -291,7 +288,6 @@ void cm55_msg_callback(uint32_t * msgData)
 int main(void)
 {
     cy_rslt_t result;
-    cy_en_ipc_pipe_status_t pipeStatus;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -318,15 +314,6 @@ int main(void)
 
     Cy_SysLib_Delay(CM55_APP_DELAY_MS);
 
-    /* Register a callback function to handle events on the CM55 IPC pipe */
-    //pipeStatus = Cy_IPC_Pipe_RegisterCallback(CM55_IPC_PIPE_EP_ADDR, &cm55_msg_callback,
-    //                                                  (uint32_t)CM55_IPC_PIPE_CLIENT_ID);
-
-    if(CY_IPC_PIPE_SUCCESS != pipeStatus)
-    {
-        CY_ASSERT(0);
-    }
-    
     #ifdef ML_DEEPCRAFT_CM55
     /* If ML_DEEPCRAFT_CPU is set as CM55, start the task */
     cm55_ml_deepcraft_init();

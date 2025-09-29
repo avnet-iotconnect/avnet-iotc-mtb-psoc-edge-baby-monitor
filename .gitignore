@@ -13,6 +13,13 @@
 # Ninja logs etc.
 .ninja*
 
+# created by project creator:
+.clangd
+project_info.json
+
+# generated into source dir during build:
+nsc_veneer.o
+
 # ModusToolbox library repos or information about library dependencies
 libs/
 

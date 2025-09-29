@@ -38,36 +38,36 @@
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
+
+/*******************************************************************************
+* Header Files
+*******************************************************************************/
+
 #include "cy_pdl.h"
 #include "cybsp.h"
-#include "security_config.h"
 
+/*****************************************************************************
+* Macros
+******************************************************************************/
+#define CM33_NS_APP_BOOT_ADDR      (CYMEM_CM33_0_m33_nvm_START + CYBSP_MCUBOOT_HEADER_SIZE)
 /*****************************************************************************
 * Function Name: main
 ******************************************************************************
 * This is the main function for Cortex M33 CPU secure application
 * NOTE: CM33 secure project assumes that certain memory and peripheral regions
-* will be accessed from Non secure environment by the CM33 NS /CM55 code,
-* For such regions MPC and PPC configurations are applied to make it non secure
-* Any access to these regions from the secure side recommended to be done before the
-* MPC/PPC configuration is applied.Once any memory or peripheral region is marked
-* as non secure it cannot be accessed from the secure side using secure aliased address 
-* but may be accessed using non secure aliased address
+* will be accessed from non-secure environment by the CM33 NS /CM55 code,
+* For such regions MPC and PPC configurations are applied by cybsp_init to make
+* it non-secure. Any access to these regions from the secure side is recommended
+* to be done before the MPC/PPC configuration is applied.Once a memory or
+* peripheral region is marked as non secure it cannot be accessed from the secure
+* side using secure aliased address but may be accessed using non secure aliased
+* address
 *****************************************************************************/
 int main(void)
 {
     uint32_t ns_stack;
-    funcptr_void NonSecure_ResetHandler;
+    cy_cmse_funcptr NonSecure_ResetHandler;
     cy_rslt_t result;
-
-    /* TrustZone setup */
-    TZ_SAU_Setup();
-
-#if defined (__FPU_USED) && (__FPU_USED == 1U) && \
-      defined (TZ_FPU_NS_USAGE) && (TZ_FPU_NS_USAGE == 1U)
-    /*FPU initialization*/
-    initFPU();
-#endif
 
     /* Set up internal routing, pins, and clock-to-peripheral connections */
     result = cybsp_init();
@@ -75,59 +75,23 @@ int main(void)
     /* Board initialization failed. Stop program execution */
     if (CY_RSLT_SUCCESS != result)
     {
+        /* Disable all interrupts. */
+        __disable_irq();
+
         CY_ASSERT(0);
+
+        /* Infinite loop */
+        while(true);
+
     }
 
     /* Enable global interrupts */
     __enable_irq();
 
-
-    /*Enables the PD1 Power Domain*/
-    Cy_System_EnablePD1();
-
-    /* 
-    * Initialize the clock for the APP_MMIO_TCM (512K) peripheral group.
-    * This sets up the necessary clock and peripheral routing to ensure 
-    * the APP_MMIO_TCM can be correctly accessed and utilized.
-    */
-    Cy_SysClk_PeriGroupSlaveInit(
-        CY_MMIO_CM55_TCM_512K_PERI_NR, 
-        CY_MMIO_CM55_TCM_512K_GROUP_NR, 
-        CY_MMIO_CM55_TCM_512K_SLAVE_NR, 
-        CY_MMIO_CM55_TCM_512K_CLK_HF_NR
-    );
-
-    /* 
-    * Initialize the clock for the SMIF0 peripheral group.
-    * This sets up the necessary clock and peripheral routing to ensure 
-    * the SMIF0 can be correctly accessed and utilized.
-    */
-    Cy_SysClk_PeriGroupSlaveInit(
-        CY_MMIO_SMIF0_PERI_NR,
-        CY_MMIO_SMIF0_GROUP_NR,
-        CY_MMIO_SMIF0_SLAVE_NR,
-        CY_MMIO_SMIF0_CLK_HF_NR
-    );
-
-    /* Enable SOCMEM */
-    Cy_SysEnableSOCMEM(true);
-
-    /* Configure semaphore */
-    config_sema();
-
-    /* Configure MPC for NS */
-    config_mpc();
-
-    ns_stack = (uint32_t)(*((uint32_t*)CM33_NS_SP_STORE));
+    ns_stack = (uint32_t)(*((uint32_t*)CM33_NS_APP_BOOT_ADDR));
     __TZ_set_MSP_NS(ns_stack);
 
-    NonSecure_ResetHandler = (funcptr_void)(*((uint32_t*)CM33_NS_RESET_HANDLER_STORE));
-
-    /* Clear SYSCPU and APPCPU power domain dependency set by boot code */
-    cy_pd_pdcm_clear_dependency(CY_PD_PDCM_APPCPU, CY_PD_PDCM_SYSCPU);
-
-    /* Configure PPC for NS */
-    config_ppc();
+    NonSecure_ResetHandler = (cy_cmse_funcptr)(*((uint32_t*)(CM33_NS_APP_BOOT_ADDR + 4)));
 
     /* Start non-secure application */
     NonSecure_ResetHandler();
@@ -138,4 +102,3 @@ int main(void)
 }
 
 /* [] END OF FILE */
-

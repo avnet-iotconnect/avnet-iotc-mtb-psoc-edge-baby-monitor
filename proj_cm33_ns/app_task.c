@@ -357,10 +357,10 @@ void app_task(void *pvParameters) {
     uint32_t hwuidhi = (uint32_t)(hwuid >> 32);
     // not using low bytes in the name because they appear to be the same across all boards of the same type
     // feel free to modify the application to use these bytes
-    uint32_t hwuidlo = (uint32_t)(hwuid & 0xFFFFFFFF);
+    // uint32_t hwuidlo = (uint32_t)(hwuid & 0xFFFFFFFF);
 
     char iotc_duid[IOTCL_CONFIG_DUID_MAX_LEN] = {0};
-    sprintf(iotc_duid, IOTCONNECT_DUID_PREFIX"%08lx", hwuidhi);
+    sprintf(iotc_duid, IOTCONNECT_DUID_PREFIX"%08lx", (unsigned long) hwuidhi);
 
     printf("TEMP device unique ID (DUID) is: %s\n", iotc_duid);
 

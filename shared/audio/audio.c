@@ -247,8 +247,9 @@ cy_rslt_t pdm_data_process(void)
     float sample = 0.0f;
     float max_score = 0.0f;
     float label_scores[IMAI_DATA_OUT_COUNT];
+#ifdef PRINT_CM55
     char *label_text[] = IMAI_DATA_OUT_SYMBOLS;
-
+#endif
     /* Check if PDM PCM Data is ready to be processed */
     if (!pdm_pcm_flag)
     {
@@ -259,13 +260,15 @@ cy_rslt_t pdm_data_process(void)
     /* Reset the flag to false, indicating that the data is being processed */
     pdm_pcm_flag = false;
 
-    // printf("\033[H\n");
+#ifdef PRINT_CM55
+    printf("\033[H\n");
 
 #ifdef COMPONENT_CM33
     printf("DEEPCRAFT Studio Deploy Audio Example - CM33\r\n\n");
 #else
     printf("DEEPCRAFT Studio Deploy Audio Example - CM55\r\n\n");
 #endif /* COMPONENT_CM33 */
+#endif
 
     for (uint32_t index = 0; index < FRAME_SIZE ; index++)
     {
@@ -294,7 +297,9 @@ cy_rslt_t pdm_data_process(void)
             {
                 for(int i = 0; i < IMAI_DATA_OUT_COUNT; i++)
                 {
+                    #ifdef PRINT_CM55
                     printf("label: %-11s: score: %.4f\r\n", label_text[i], label_scores[i]);
+                    #endif
                     if (label_scores[i] > max_score)
                     {
                         max_score = label_scores[i];
@@ -306,11 +311,15 @@ cy_rslt_t pdm_data_process(void)
                 {
                     cry_detect = best_label;
 					data_refresh_flag = 1;
+                    #ifdef PRINT_CM55
                     printf("\n\nOutput: %-10s\r\n", label_text[best_label]);
+                    #endif
                 }
                 else
                 {
+                    #ifdef PRINT_CM55
                     printf("\n\nOutput: %-10s\r\n", "");
+                    #endif
                 }
 
                 break;

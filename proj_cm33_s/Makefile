@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# $ Copyright 2022-2023 Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2023-2025, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,10 +69,6 @@ VCORE_ATTRS=SECURE
 #Configure this application to be loaded into flash/ram. 
 APPTYPE=flash
 
-#Config file for postbuild sign and merge operations.
-#NOTE:Check the JSON file for the command parameters
-COMBINE_SIGN_JSON?=configs/boot_with_extended_boot.json
-
 # By default the build system automatically looks in the Makefile's directory
 # tree for source code and builds it. The SOURCES variable can be used to
 # manually add source code to the build process from a location not searched
@@ -107,11 +103,20 @@ ASFLAGS+=
 # Additional / custom linker flags.
 LDFLAGS+=
 
+ifeq ($(TOOLCHAIN),ARM)
+ LDFLAGS+=--diag_suppress=L6848
+endif
+
+
 # Additional / custom libraries to link in to the application.
 LDLIBS+=
 
 # Path to the linker script to use (if empty, use the default linker script).
 LINKER_SCRIPT=
+# Custom pre-build commands to run.
+PREBUILD=
+# Custom post-build commands to run.
+POSTBUILD=
 
 ################################################################################
 # Paths
@@ -134,11 +139,5 @@ CY_GETLIBS_SHARED_PATH=../..
 # Directory name of the shared repo location.
 #
 CY_GETLIBS_SHARED_NAME=mtb_shared
-
-# Absolute path to the compiler's "bin" directory.
-#
-# The default depends on the selected TOOLCHAIN (GCC_ARM uses the ModusToolbox
-# IDE provided compiler by default).
-CY_COMPILER_PATH?=
 
 include $(CY_TOOLS_DIR)/make/start.mk

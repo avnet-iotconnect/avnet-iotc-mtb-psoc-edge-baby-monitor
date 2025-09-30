@@ -38,6 +38,7 @@ APPNAME=proj_cm33_ns
 # If set to "true" or "1", display full command-lines when building.
 VERBOSE=
 
+
 ################################################################################
 # Advanced Configuration
 ################################################################################
@@ -55,7 +56,7 @@ VERBOSE=
 COMPONENTS+=FREERTOS LWIP MBEDTLS WCM SECURE_SOCKETS
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
-DISABLE_COMPONENTS= 
+DISABLE_COMPONENTS=
 
 CORE=CM33
 CORE_NAME=CM33_0
@@ -74,7 +75,7 @@ INCLUDES+=../shared/include
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE 
+DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE
 
 # Default configuration of mbedtls library.
 DEFINES+=MBEDTLS_CONFIG_FILE='"mbedtls/mbedtls_config.h"'
@@ -82,7 +83,7 @@ DEFINES+=MBEDTLS_CONFIG_FILE='"mbedtls/mbedtls_config.h"'
 DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"configs/ifx_psa_crypto_config.h"'
 
 ifeq ($(TOOLCHAIN),LLVM_ARM)
-DEFINES+=CY_MQTT_EVENT_THREAD_STACK_SIZE=5*1024
+DEFINES+=CY_MQTT_EVENT_THREAD_STACK_SIZE=10*1024
 endif
 
 # for http client
@@ -95,7 +96,7 @@ DEFINES+=SNTP_SERVER_DNS
 SEARCH+=../shared/retarget_io/
 
 # Select softfp or hardfp floating point. Default is softfp.
-VFP_SELECT=
+VFP_SELECT+=
 
 # Additional / custom C compiler flags.
 #
@@ -119,7 +120,7 @@ ASFLAGS+=
 LDFLAGS+=
 
 # Additional / custom libraries to link in to the application.
-LDLIBS=
+LDLIBS+=
 
 # Path to the linker script to use (if empty, use the default linker script).
 LINKER_SCRIPT=
@@ -127,16 +128,8 @@ LINKER_SCRIPT=
 # Custom pre-build commands to run.
 PREBUILD=
 
-# IAR/ARM compiler uses the C-AHB address for compilation. C-AHB address is  
-# read-only. Relocate to S-AHB address for programming the image. 
-# (This step is only required for CM33 core) 
-ifneq (,$(filter $(TOOLCHAIN),ARM IAR))
-APP_START=0x60340400
-POSTBUILD=$(CY_TOOL_edgeprotecttools_EXE_ABS) bin2hex \
-        --image $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).bin \
-        --output $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).hex \
-        --offset $(APP_START)
-endif
+# Custom post-build commands to run.
+POSTBUILD=
 
 ################################################################################
 # Paths
@@ -149,21 +142,16 @@ CY_APP_PATH=
 
 # Relative path to the shared repo location.
 #
-# All .mtb files have the format, <URI>#<COMMIT>#<LOCATION>. If the <LOCATION> field 
-# begins with $$ASSET_REPO$$, then the repo is deposited in the path specified by 
-# the CY_GETLIBS_SHARED_PATH variable. The default location is one directory level 
-# above the current app directory.
-# This is used with CY_GETLIBS_SHARED_NAME variable, which specifies the directory name.
+# All .mtb files have the format, <URI>#<COMMIT>#<LOCATION>. If the <LOCATION>
+# field begins with $$ASSET_REPO$$, then the repo is deposited in the path
+# specified by the CY_GETLIBS_SHARED_PATH variable. The default location is one
+# directory level above the current app directory.
+# This is used with CY_GETLIBS_SHARED_NAME variable, which specifies the
+# directory name.
 CY_GETLIBS_SHARED_PATH=../..
 
 # Directory name of the shared repo location.
 #
 CY_GETLIBS_SHARED_NAME=mtb_shared
-
-# Absolute path to the compiler's "bin" directory.
-#
-# The default depends on the selected TOOLCHAIN (GCC_ARM uses the ModusToolbox
-# IDE provided compiler by default).
-CY_COMPILER_PATH?=
 
 include $(CY_TOOLS_DIR)/make/start.mk

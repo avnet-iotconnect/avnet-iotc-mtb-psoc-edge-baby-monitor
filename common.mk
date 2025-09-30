@@ -29,7 +29,7 @@ MTB_TYPE=PROJECT
 # To change the target, it is recommended to use the Library manager
 # ('make library-manager' from command line), which will also update 
 # Eclipse IDE launch configurations.
-TARGET=APP_KIT_PSE84_EVAL_EPC2
+TARGET=APP_KIT_PSE84_AI
 
 # Name of toolchain to use. Options include:
 #
@@ -55,5 +55,9 @@ CONFIG=Debug
 # cm33
 # cm55
 #ML_DEEPCRAFT_CPU=cm55
+
+# Config file for postbuild sign and merge operations.
+# NOTE: Check the JSON file for the command parameters
+COMBINE_SIGN_JSON?=configs/boot_with_extended_boot.json
 
 include ../common_app.mk

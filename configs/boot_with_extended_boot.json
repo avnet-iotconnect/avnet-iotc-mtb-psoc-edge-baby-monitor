@@ -4,29 +4,30 @@
     [
         {
             "name": "metadata_proj_cm33_s",
+            "description": "add MCUboot metadata to the hex",
             "enabled" : true,
-            "commands" : 
+            "commands" :
             [
                 {
                     "command" : "sign",
-                    "inputs" : 
+                    "inputs" :
                     [
                         {
                             "file" : "../build/project_hex/proj_cm33_s.hex",
                             "header-size": "0x400",
                             "fill-value" : "0xff",
-                            "slot-size" : "0x80000",
-                            "hex-address" : "0x70100000"
+                            "slot-size" : "0x240000",
+                            "hex-address" : "{{CYMEM_CM33_0_S_m33s_nvm_S_START}}"
                         }
                     ],
-                    "outputs": 
+                    "outputs":
                     [
                         {
                             "file" : "../build/project_hex/proj_cm33_s_signed.hex",
                             "format": "ihex"
                         }
                     ],
-                    "extra_config": 
+                    "extra_config":
                     [
                         {
                             "project": "proj_cm33_s",
@@ -39,7 +40,41 @@
             ]
         },
         {
+            "name": "relocate_proj_cm33_ns",
+            "description": "relocate the hex to a programmable (S-BUS) address",
+            "enabled" : true,
+            "commands" :
+            [
+                {
+                    "command" : "hex-relocate",
+                    "inputs" :
+                    [
+                        {
+                            "file" : "../build/project_hex/proj_cm33_ns.hex",
+                            "regions" : "{{RelocationTable}}"
+                        }
+                    ],
+                    "outputs":
+                    [
+                        {
+                            "file" : "../build/project_hex/proj_cm33_ns_shifted.hex"
+                        }
+                    ],
+                    "extra_config":
+                    [
+                        {
+                            "project": "proj_cm33_ns",
+                            "debug_config_name" : "proj_cm33_ns",
+                            "default":false,
+                            "build_dependency" : "project"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "merge",
+            "description": "combine individual project hex files into a single hex",
             "enabled": true,
             "commands" :
             [
@@ -51,7 +86,7 @@
                             "file" : "../build/project_hex/proj_cm33_s_signed.hex"
                         },
                         {
-                            "file" : "../build/project_hex/proj_cm33_ns.hex"
+                            "file" : "../build/project_hex/proj_cm33_ns_shifted.hex"
                         },
                         {
                             "file" : "../build/project_hex/proj_cm55.hex"

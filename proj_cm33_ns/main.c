@@ -310,7 +310,7 @@ int main(void)
     //printf("\x1b[2J\x1b[;H");
     //printf("===============================================================\n");
 
-    //printf("PSOC Edge MCU: Wi-Fi MQTT Client\n");
+    printf("PSOC Edge MCU: /IOTCONNECT Client\n");
 
     //printf("===============================================================\n\n");
 

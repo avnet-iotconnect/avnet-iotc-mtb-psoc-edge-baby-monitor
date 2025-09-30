@@ -78,8 +78,6 @@ typedef mtb_hal_rtc_t rtc_type;
 
 bool ipc_is_class_detected = false;
 
-static bool cm33_pipe2_msg_received = false;
-
 /*****************************************************************************
  * Function Definitions
  *****************************************************************************/
@@ -200,8 +198,6 @@ void cm33_msg_callback(uint32_t * msg_data) {
         //msg_cmd = ipc_recv_msg->cmd;
         ipc_is_class_detected = (ipc_recv_msg->value != 0);
     }
-    
-    cm33_pipe2_msg_received = true;
 }
 /*******************************************************************************
 * Function Name: handle_error
@@ -225,20 +221,6 @@ static void handle_error(void) {
     while(true);
 }
 
-static void ipc_data(void) {
-	if(cm33_pipe2_msg_received) {
-		printf("%s\n\r", (ipc_is_class_detected ? "true" : "false"));
-		cm33_pipe2_msg_received = false;
-    }
-}
-
-void ipc_task(void *pvParameters) {
-    (void) pvParameters;
-	for(;;) {
-		ipc_data();
-		Cy_SysLib_Delay(100);
-	}
-}
 /******************************************************************************
  * Function Name: main
  ******************************************************************************
@@ -328,8 +310,6 @@ int main(void)
 		handle_app_error();
 	}
              
-    result = xTaskCreate(ipc_task, "IPC task", 1024,
-                NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
             
     if( pdPASS == result )
     {

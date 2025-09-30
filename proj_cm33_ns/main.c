@@ -76,9 +76,6 @@
 static mtb_hal_lptimer_t lptimer_obj;
 typedef mtb_hal_rtc_t rtc_type;
 
-//ipc
-CY_SECTION_SHAREDMEM static ipc_msg_t cm33_msg_data;
-
 bool ipc_is_class_detected = false;
 
 static bool cm33_pipe2_msg_received = false;

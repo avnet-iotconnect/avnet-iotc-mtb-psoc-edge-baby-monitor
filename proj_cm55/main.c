@@ -43,7 +43,6 @@
 #include "cyabs_rtos.h"
 #include "cyabs_rtos_impl.h"
 
-
 #include "ipc_communication.h"
 //#include "retarget_io_init.h"
 #ifdef ML_DEEPCRAFT_CM55
@@ -306,7 +305,7 @@ int main(void)
     
     
     /* Initialize retarget-io middleware */ 
-    //init_retarget_io(); //for printf
+    // init_retarget_io(); //for printf
     
     
     /* Setup IPC communication for CM55*/

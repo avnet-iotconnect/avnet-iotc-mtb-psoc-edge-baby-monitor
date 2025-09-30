@@ -40,34 +40,31 @@
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
-#ifndef APP_CONFIG_H_
-#define APP_CONFIG_H_
+#ifndef APP_CONFIG_H
+#define APP_CONFIG_H
 
 #include "cy_mqtt_api.h"
 
-//IOTCONNECT CONFIGS
-#define IOTCONNECT_DUID_PREFIX "e84-bm-"
+// see IotConnectConnectionType: IOTC_CT_AWS or IOTC_CT_AZURE
 #define IOTCONNECT_CONNECTION_TYPE IOTC_CT_AWS
 #define IOTCONNECT_CPID "MYCPID"
 #define IOTCONNECT_ENV  "poc"
 
-/**************** MQTT CLIENT CERTIFICATE CONFIGURATION MACROS ****************/
+// prefix for the auto-generated name based on chip HWUID
+#define IOTCONNECT_DUID_PREFIX "e84-bm-"
 
-/* Configure the below credentials in case of a secure MQTT connection. */
-/* PEM-encoded client certificate */
+/**************** /IOTCONNECT CERTIFICATE CONFIGURATION MACROS ****************/
+
+/* Configure the device certificate and private key per this pattern below: */
 #define CLIENT_CERTIFICATE      \
 "-----BEGIN CERTIFICATE-----\n" \
+".... base64 encoded certificate ..."\
 "-----END CERTIFICATE-----"
 
 /* PEM-encoded client private key */
 #define CLIENT_PRIVATE_KEY          \
 "-----BEGIN RSA PRIVATE KEY-----\n" \
+".... base64 encoded private key ..."\
 "-----END RSA PRIVATE KEY-----"
 
-/* PEM-encoded Root CA certificate */ //AmazonRootCA1
-#define ROOT_CA_CERTIFICATE     \
-"-----BEGIN CERTIFICATE-----\n" \
-"-----END CERTIFICATE-----"
-
-
-#endif /* APP_CONFIG_H_ */
+#endif /* APP_CONFIG_H */

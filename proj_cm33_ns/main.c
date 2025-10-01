@@ -225,8 +225,8 @@ int main(void)
     /* Enable CM55. CY_CORTEX_M55_APPL_ADDR must be updated if CM55 memory layout is changed. */
     Cy_SysEnableCM55(MXCM55, CY_CM55_APP_BOOT_ADDR, CM55_BOOT_WAIT_TIME_US);
 
-    result = xTaskCreate(app_task, "IOTC APP task", IOTC_TASK_STACK_SIZE,
-                NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
+    result = xTaskCreate(app_task, "IOTC APP task", APP_TASK_STACK_SIZE,
+                NULL, APP_TASK_PRIORITY, NULL);
     if( pdPASS != result ) {
 		handle_app_error();
 	}

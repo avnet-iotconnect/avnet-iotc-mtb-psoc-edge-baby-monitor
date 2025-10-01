@@ -43,7 +43,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-#include "cy_mqtt_api.h"
+#include "iotconnect.h"
 
 // see IotConnectConnectionType: IOTC_CT_AWS or IOTC_CT_AZURE
 #define IOTCONNECT_CONNECTION_TYPE IOTC_CT_AWS
@@ -53,18 +53,24 @@
 // prefix for the auto-generated name based on chip HWUID
 #define IOTCONNECT_DUID_PREFIX "e84-bm-"
 
-/**************** /IOTCONNECT CERTIFICATE CONFIGURATION MACROS ****************/
-
-/* Configure the device certificate and private key per this pattern below: */
-#define CLIENT_CERTIFICATE      \
+/*
+ PEM format certificate and private key
+Example:
+#define IOTCONNECT_DEVICE_CERT \
 "-----BEGIN CERTIFICATE-----\n" \
 ".... base64 encoded certificate ..."\
 "-----END CERTIFICATE-----"
-
-/* PEM-encoded client private key */
-#define CLIENT_PRIVATE_KEY          \
-"-----BEGIN RSA PRIVATE KEY-----\n" \
+#define IOTCONNECT_DEVICE_KEY \
+"-----BEGIN PRIVATE KEY-----\n" \
 ".... base64 encoded private key ..."\
-"-----END RSA PRIVATE KEY-----"
+"-----END PRIVATE KEY-----"
+Leave certificate and private key blank if  you wish to use EMEEPROM data to automatically generate the certificate
+and use the runtime configuration for all of the configurable values in this file.
+IMPORTANT NOTE: If you use the EMEEPROM runtime configuration,
+the certificate and private key will be regenerated when you re-flash the board!
+In that case, you would need to delete and re-create your device in IoTConnect.
+*/
+#define IOTCONNECT_DEVICE_CERT ""
+#define IOTCONNECT_DEVICE_KEY ""
 
 #endif /* APP_CONFIG_H */

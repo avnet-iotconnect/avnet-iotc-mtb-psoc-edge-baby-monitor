@@ -38,6 +38,10 @@
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
+/* SPDX-License-Identifier: MIT
+ * Copyright (C) 2025 Avnet
+ * Authors: Nikola Markovic <nikola.markovic@avnet.com>, Shu Liu <shu.liu@avnet.com> et al.
+ */
 
 #include <string.h>
 #include "cybsp.h"

@@ -1,13 +1,5 @@
-/******************************************************************************
-* File Name:   mqtt_task.h
-*
-* Description: This file is the public interface of mqtt_task.c
-*
-* Related Document: See README.md
-*
-*
-*******************************************************************************
-* Copyright 2024-2025, Cypress Semiconductor Corporation (an Infineon company) or
+/*******************************************************************************
+* Copyright 2020-2021, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -38,46 +30,17 @@
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
+//
+// Copyright: Avnet 2021
+// Modified by Nik Markovic <nikola.markovic@avnet.com> on 11/11/21.
+//
 
-#ifndef MQTT_TASK_H_
-#define MQTT_TASK_H_
+#ifndef APP_TASK_H_
+#define APP_TASK_H_
 
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "cy_mqtt_api.h"
+#define APP_TASK_PRIORITY       (2)
+#define APP_TASK_STACK_SIZE     (1024 * 8)
 
-
-/*******************************************************************************
-* Macros
-********************************************************************************/
-/* Task parameters for MQTT Client Task. */
-#define MQTT_CLIENT_TASK_PRIORITY       (2U)
-#define MQTT_CLIENT_TASK_STACK_SIZE     (1024U * 2U)
-#define IOTC_TASK_STACK_SIZE     		(1024U * 8U)
-
-/*******************************************************************************
-* Global Variables
-********************************************************************************/
-/* Commands for the MQTT Client Task. */
-typedef enum
-{
-    HANDLE_MQTT_SUBSCRIBE_FAILURE,
-    HANDLE_MQTT_PUBLISH_FAILURE,
-    HANDLE_DISCONNECTION
-} mqtt_task_cmd_t;
-
-/*******************************************************************************
- * Extern variables
- ******************************************************************************/
-extern cy_mqtt_t mqtt_connection;
-extern QueueHandle_t mqtt_task_q;
-
-/*******************************************************************************
-* Function Prototypes
-********************************************************************************/
-void mqtt_client_task(void *pvParameters);
 void app_task(void *pvParameters);
 
-#endif /* MQTT_TASK_H_ */
-
-/* [] END OF FILE */
+#endif // APP_TASK_H_

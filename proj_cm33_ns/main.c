@@ -48,8 +48,6 @@
 #include "cyabs_rtos_impl.h"
 #include "cy_time.h"
 #include "cycfg_peripherals.h"
-
-//IPC
 #include "ipc_communication.h"
 
 /******************************************************************************

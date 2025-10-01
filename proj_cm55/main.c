@@ -110,7 +110,7 @@ static void cm55_task(void * arg)
     for (;;)
     {     	
        	#ifdef ML_DEEPCRAFT_CM55
-		pdm_data_process();		
+		pdm_data_process();
 		#endif
        	Cy_SysLib_Delay(50);
     	

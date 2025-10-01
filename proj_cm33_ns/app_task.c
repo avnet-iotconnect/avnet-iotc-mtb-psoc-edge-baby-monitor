@@ -478,7 +478,7 @@ void app_task(void *pvParameters) {
     config.qos = 1;
     config.verbose = true;
     config.x509_config.device_cert = IOTCONNECT_DEVICE_CERT;
-    config.x509_config.device_key = IOTCONNECT_DEVICE_CERT;
+    config.x509_config.device_key = IOTCONNECT_DEVICE_KEY;
     config.callbacks.status_cb = on_connection_status;
     config.callbacks.cmd_cb = on_command;
     config.callbacks.ota_cb = on_ota;

@@ -69,20 +69,11 @@
  */
 #define APP_LPTIMER_INTERRUPT_PRIORITY      (1U)
 
-//ipc
-#define CM55_APP_DELAY_MS           (50U)
-#define RESET_VAL                   (0U)
-
 /*****************************************************************************
  * Global Variables
  *****************************************************************************/
 
 static mtb_hal_lptimer_t lptimer_obj;
-
-//ipc
-CY_SECTION_SHAREDMEM static ipc_msg_t cm55_msg_data;
-static volatile uint8_t msg_cmd = RESET_VAL;
-static volatile uint32_t ipc_msg = RESET_VAL;
 
 uint32_t cry_detect = 0;
 volatile uint8_t data_refresh_flag = 0;
@@ -115,28 +106,11 @@ static void cm55_ml_deepcraft_init(void);
 static void cm55_task(void * arg)
 {
     CY_UNUSED_PARAMETER(arg);
-            
-    cm55_msg_data.client_id = CM33_IPC_PIPE_CLIENT_ID;
-    cm55_msg_data.intr_mask = CY_IPC_CYPIPE_INTR_MASK_EP2;
-    cm55_msg_data.cmd = IPC_CMD_INIT;
-    cm55_msg_data.value = RESET_VAL;
 
     for (;;)
     {     	
        	#ifdef ML_DEEPCRAFT_CM55
-		pdm_data_process();
-		if(data_refresh_flag) {
-        	//printf("\n..........ai data is %d.\n\n", audio_data);
-            cm55_msg_data.value = cry_detect;
-            Cy_IPC_Pipe_SendMessage(CM33_IPC_PIPE_EP_ADDR, 
-                                         CM55_IPC_PIPE_EP_ADDR, 
-                                         (void *) &cm55_msg_data, 0);
-            data_refresh_flag = 0;
-        } else {
-			cm55_msg_data.value = RESET_VAL;
-			data_refresh_flag = 0;
-		}
-
+		pdm_data_process();		
 		#endif
        	Cy_SysLib_Delay(50);
     	
@@ -236,37 +210,6 @@ static void setup_tickless_idle_timer(void)
     cyabs_rtos_set_lptimer(&lptimer_obj);
 }
 
-/*******************************************************************************
-* Function Name: cm33_msg_callback
-********************************************************************************
-* Summary:
-*  Callback function called when endpoint-2 (CM55) has received a message
-*
-* Parameters:
-*  msg_data: Message data received throuig IPC
-*
-* Return :
-*  void
-*
-*******************************************************************************/
-#if 0
-void cm55_msg_callback(uint32_t * msgData)
-{
-    ipc_msg_t *ipc_recv_msg;
-
-    if (msgData != NULL)
-    {
-        /* Cast the message received to the IPC structure */
-        ipc_recv_msg = (ipc_msg_t *) msgData;
-
-        /* Extract the command to be processed in the main loop */
-        ipc_msg = ipc_recv_msg->value;
-    }
-
-    //cm55_pipe2_msg_received = true;
-}
-#endif
-
 /*****************************************************************************
  * Function Name: main
  ******************************************************************************
@@ -311,7 +254,7 @@ int main(void)
     /* Setup IPC communication for CM55*/
     cm55_ipc_communication_setup();
 
-    Cy_SysLib_Delay(CM55_APP_DELAY_MS);
+    Cy_SysLib_Delay(50);
 
     #ifdef ML_DEEPCRAFT_CM55
     /* If ML_DEEPCRAFT_CPU is set as CM55, start the task */

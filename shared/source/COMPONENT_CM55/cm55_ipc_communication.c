@@ -41,7 +41,6 @@
 
 #include "ipc_communication.h"
 
-
 /*******************************************************************************
 * Global Variable(s)
 *******************************************************************************/
@@ -49,8 +48,22 @@
 static cy_stc_ipc_pipe_ep_t cm55_ipc_pipe_array[CY_IPC_MAX_ENDPOINTS];
 
 /* CB Array for EP2 */
-static cy_ipc_pipe_callback_ptr_t ep2_cb_array[CY_IPC_CYPIPE_CLIENT_CNT]; 
+static cy_ipc_pipe_callback_ptr_t ep2_cb_array[CY_IPC_CYPIPE_CLIENT_CNT];
 
+CY_SECTION_SHAREDMEM static ipc_msg_t cm55_msg_data;
+
+
+__STATIC_INLINE void handle_app_error(void)
+{
+    /* Disable all interrupts. */
+    __disable_irq();
+
+    CY_ASSERT(0);
+
+    /* Infinite loop */
+    while(true);
+
+}
 
 /*******************************************************************************
 * Function Name: Cy_SysIpcPipeIsrCm55
@@ -122,4 +135,25 @@ void cm55_ipc_communication_setup(void)
     Cy_IPC_Pipe_Config(cm55_ipc_pipe_array);
 
     Cy_IPC_Pipe_Init(&cm55_ipc_pipe_config);
+}
+
+
+ipc_payload_t* cm55_ipc_get_payload_ptr(void)
+{
+    return &cm55_msg_data.payload;
+}
+
+void cm55_ipc_send_to_cm33(void)
+{
+    cy_en_ipc_pipe_status_t pipe_status;
+
+    cm55_msg_data.client_id = CM33_IPC_PIPE_CLIENT_ID;
+    cm55_msg_data.intr_mask = CY_IPC_CYPIPE_INTR_MASK_EP2;
+
+    pipe_status = Cy_IPC_Pipe_SendMessage(CM33_IPC_PIPE_EP_ADDR,
+                             CM55_IPC_PIPE_EP_ADDR,
+                             (void *) &cm55_msg_data, 0);
+    if (CY_IPC_PIPE_SUCCESS != pipe_status) {
+        handle_app_error();
+    }
 }

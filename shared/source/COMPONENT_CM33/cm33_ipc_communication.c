@@ -39,6 +39,10 @@
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
+#include <string.h>
+#include "cybsp.h"
+#include "FreeRTOS.h"
+#include "retarget_io_init.h"
 #include "ipc_communication.h"
 
 
@@ -55,6 +59,28 @@ static cy_ipc_pipe_callback_ptr_t ep1_cb_array[CY_IPC_CYPIPE_CLIENT_CNT];
 CY_SECTION_SHAREDMEM
 static uint32_t ipc_sema_array[CY_IPC_SEMA_COUNT / CY_IPC_SEMA_PER_WORD];
 
+/* Local copy of the IPC message received
+   This copy is not safe to be accessed from a task.
+   A task must make its own copy of this structure
+   while guarding the copying with taskENTER_CRITICAL() and taskEXIT_CRITICAL()
+*/
+static ipc_msg_t ipc_recv_msg = {0};
+static bool ipc_has_received_message = false; // will be set upon receipt. reset when value is checked
+
+
+/*******************************************************************************
+* Function Name: cm33_ipc_pipe_isr
+********************************************************************************
+* Callback for receipt of message from cm55
+*******************************************************************************/
+static void cm33_msg_callback(uint32_t * msg_data)
+{
+    if (msg_data != NULL) {
+        /* Copy the message received into our own copy IPC structure */
+        memcpy(&ipc_recv_msg, (void *) msg_data, sizeof(ipc_recv_msg));
+        ipc_has_received_message = true;
+    }
+}
 
 /*******************************************************************************
 * Function Name: cm33_ipc_pipe_isr
@@ -73,7 +99,6 @@ void cm33_ipc_pipe_isr(void)
 {
     Cy_IPC_Pipe_ExecuteCallback(CM33_IPC_PIPE_EP_ADDR);
 }
-
 
 /*******************************************************************************
 * Function Name: cm33_ipc_communication_setup
@@ -129,4 +154,29 @@ void cm33_ipc_communication_setup(void)
     Cy_IPC_Pipe_Config(cm33_ipc_pipe_ep_array);
 
     Cy_IPC_Pipe_Init(&cm33_ipc_pipe_config);
+
+    cy_en_ipc_pipe_status_t pipe_status;
+    /* Register a callback function to handle events on the CM33 IPC pipe */
+    pipe_status = Cy_IPC_Pipe_RegisterCallback(CM33_IPC_PIPE_EP_ADDR, &cm33_msg_callback,
+                                              (uint32_t)CM33_IPC_PIPE_CLIENT_ID);
+    if (CY_IPC_PIPE_SUCCESS != pipe_status) {
+        handle_app_error();
+    }
+
+}
+
+bool cm33_ipc_has_received_message(void)
+{
+    taskENTER_CRITICAL();
+    bool ret = ipc_has_received_message;
+    ipc_has_received_message = false;
+    taskEXIT_CRITICAL();
+    return ret;
+}
+
+void cm33_ipc_safe_copy_last_payload(ipc_payload_t* target)
+{
+    taskENTER_CRITICAL();
+    memcpy(target, &ipc_recv_msg.payload, sizeof(ipc_payload_t));
+    taskEXIT_CRITICAL();
 }

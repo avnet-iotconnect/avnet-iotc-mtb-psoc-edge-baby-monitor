@@ -79,23 +79,24 @@
 /* Combined Interrupt Mask */
 #define CY_IPC_CYPIPE_INTR_MASK         ( CY_IPC_CYPIPE_CHAN_MASK_EP1 | CY_IPC_CYPIPE_CHAN_MASK_EP2)
 
-/* Command messages sent from CM55 to CM33 */
-#define IPC_CMD_INIT                    (0x81)
-#define IPC_CMD_START                   (0x82)
-#define IPC_CMD_STOP                    (0x83)
-#define IPC_CMD_STATUS                  (0x41)
-
 /*******************************************************************************
 * Enumeration
 *******************************************************************************/
+
+/* The actual payload being sent via IPC. This will vary b etween applications */
+typedef struct {
+    uint32_t    label_id;
+    char        label[255];
+    float       confidence;
+} ipc_payload_t;
+
 /* IPC Message structure */
 /* Pointer to this structure will be shared through IPC Pipe */
 typedef struct
 {
-    uint8_t     client_id;
-    uint16_t    intr_mask;
-    uint8_t     cmd;
-    uint32_t    value;
+    uint8_t     client_id; /* This must be a part of the IPC structure */
+    uint16_t    intr_mask; /* This must be a part of the IPC structure */
+    ipc_payload_t   payload;
 } ipc_msg_t;
 
 /*******************************************************************************
@@ -105,5 +106,13 @@ void cm33_ipc_communication_setup(void);
 void cm33_ipc_pipe_isr(void);
 void cm55_ipc_communication_setup(void);
 void cm55_ipc_pipe_isr(void);
+
+/* App functions for cm33 */
+bool cm33_ipc_has_received_message(void);
+void cm33_ipc_safe_copy_last_payload(ipc_payload_t* target);
+
+/* App functions for cm55 */
+ipc_payload_t* cm55_ipc_get_payload_ptr(void);
+void cm55_ipc_send_to_cm33(void);
 
 #endif /* SOURCE_IPC_COMMUNICATION_H */

@@ -45,6 +45,8 @@
 #include "baby_cry.h"
 #include <math.h>
 
+#include "ipc_communication.h"
+
 /******************************************************************************
  * Macros
  *****************************************************************************/
@@ -105,10 +107,6 @@ static const cy_stc_sysint_t PDM_IRQ_cfg =
 /* Flag to check if the data from PDM/PCM block is ready for processing. */
 static volatile bool pdm_pcm_flag;
 
-
-/*ipc*/
-extern uint8_t data_refresh_flag;
-extern uint32_t cry_detect;
 /*******************************************************************************
 * Local Function Prototypes
 *******************************************************************************/
@@ -247,9 +245,8 @@ cy_rslt_t pdm_data_process(void)
     float sample = 0.0f;
     float max_score = 0.0f;
     float label_scores[IMAI_DATA_OUT_COUNT];
-#ifdef PRINT_CM55
     char *label_text[] = IMAI_DATA_OUT_SYMBOLS;
-#endif
+
     /* Check if PDM PCM Data is ready to be processed */
     if (!pdm_pcm_flag)
     {
@@ -307,20 +304,28 @@ cy_rslt_t pdm_data_process(void)
                     }
                 }
 
+                ipc_payload_t* payload = cm55_ipc_get_payload_ptr();
+
                 if(max_score >= OUTPUT_THRESHOLD_SCORE)
                 {
-                    cry_detect = best_label;
-					data_refresh_flag = 1;
+                    payload->label_id = best_label;
+                    strcpy(payload->label, label_text[best_label]);
+                    payload->confidence = label_scores[best_label];
                     #ifdef PRINT_CM55
                     printf("\n\nOutput: %-10s\r\n", label_text[best_label]);
                     #endif
                 }
                 else
                 {
+                    payload->label_id = 0;
+                    strcpy(payload->label, label_text[0]);
+                    payload->confidence = label_scores[0];
+
                     #ifdef PRINT_CM55
                     printf("\n\nOutput: %-10s\r\n", "");
                     #endif
                 }
+                cm55_ipc_send_to_cm33();
 
                 break;
             }

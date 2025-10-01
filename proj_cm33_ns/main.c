@@ -66,17 +66,12 @@
  */
 #define APP_LPTIMER_INTERRUPT_PRIORITY      (1U)
 
-//ipc
-#define CM33_APP_DELAY_MS           (50U)
-
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
 /* LPTimer HAL object */
 static mtb_hal_lptimer_t lptimer_obj;
 typedef mtb_hal_rtc_t rtc_type;
-
-bool ipc_is_class_detected = false;
 
 /*****************************************************************************
  * Function Definitions
@@ -173,54 +168,6 @@ static void setup_tickless_idle_timer(void)
     cyabs_rtos_set_lptimer(&lptimer_obj);
 }
 
-/*******************************************************************************
-* Function Name: cm33_msg_callback
-********************************************************************************
-* Summary:
-*  Callback function called when endpoint-1 (CM33) has received a message
-*
-* Parameters:
-*  msg_data: Message data received throuig IPC
-*
-* Return :
-*  void
-*
-*******************************************************************************/
-void cm33_msg_callback(uint32_t * msg_data) {
-    ipc_msg_t *ipc_recv_msg;
-
-    if (msg_data != NULL)
-    {
-        /* Cast the message received to the IPC structure */
-        ipc_recv_msg = (ipc_msg_t *) msg_data;
-
-        /* Extract the command and data to be processed in the main loop */
-        //msg_cmd = ipc_recv_msg->cmd;
-        ipc_is_class_detected = (ipc_recv_msg->value != 0);
-    }
-}
-/*******************************************************************************
-* Function Name: handle_error
-********************************************************************************
-* Summary:
-*  Function to handle error status
-*
-* Parameters:
-*  none
-*
-* Return :
-*  void
-*
-*******************************************************************************/
-static void handle_error(void) {
-    /* Disable all interrupts. */
-    __disable_irq();
-
-    CY_ASSERT(0);
-
-    while(true);
-}
-
 /******************************************************************************
  * Function Name: main
  ******************************************************************************
@@ -240,9 +187,7 @@ int main(void)
 {
     cy_rslt_t result;
     rtc_type obj;
-    
-    cy_en_ipc_pipe_status_t pipeStatus;
-    
+        
     /* Initialize the board support package. */
     
     result = cybsp_init();
@@ -267,42 +212,20 @@ int main(void)
     /* Initialize the CLIB support library */
     mtb_clib_support_init(&obj);
     
-    
-    
-    //IPC ####################################################################################
     /* Setup IPC communication for CM33 */
     cm33_ipc_communication_setup();
-
-    Cy_SysLib_Delay(CM33_APP_DELAY_MS);
+    Cy_SysLib_Delay(50);
     
-    /* Register a callback function to handle events on the CM33 IPC pipe */
-    pipeStatus = Cy_IPC_Pipe_RegisterCallback(CM33_IPC_PIPE_EP_ADDR, &cm33_msg_callback,
-                                              (uint32_t)CM33_IPC_PIPE_CLIENT_ID);
-
-    if (CY_IPC_PIPE_SUCCESS != pipeStatus) {
-        handle_error();
-    }
-    
-    Cy_SysLib_Delay(CM33_APP_DELAY_MS);
-    
-    
-    
-
     /* \x1b[2J\x1b[;H - ANSI ESC sequence to clear screen. */
-    //printf("\x1b[2J\x1b[;H");
-    //printf("===============================================================\n");
+    printf("\x1b[2J\x1b[;H");
+    printf("===============================================================\n");
 
     printf("PSOC Edge MCU: /IOTCONNECT Client\n");
 
-    //printf("===============================================================\n\n");
+    printf("===============================================================\n\n");
 
     /* Enable CM55. CY_CORTEX_M55_APPL_ADDR must be updated if CM55 memory layout is changed. */
     Cy_SysEnableCM55(MXCM55, CY_CM55_APP_BOOT_ADDR, CM55_BOOT_WAIT_TIME_US);
-
-    /* Create the MQTT Client task. */
-    //result = xTaskCreate(mqtt_client_task, "MQTT Client task", MQTT_CLIENT_TASK_STACK_SIZE,
-    //             NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
-
 
     result = xTaskCreate(app_task, "IOTC APP task", IOTC_TASK_STACK_SIZE,
                 NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);

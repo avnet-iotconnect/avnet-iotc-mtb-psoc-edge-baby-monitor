@@ -86,7 +86,7 @@
 /* The actual payload being sent via IPC. This will vary b etween applications */
 typedef struct {
     uint32_t    label_id;
-    char        label[255];
+    char        label[256];
     float       confidence;
 } ipc_payload_t;
 
@@ -94,8 +94,8 @@ typedef struct {
 /* Pointer to this structure will be shared through IPC Pipe */
 typedef struct
 {
-    uint8_t     client_id; /* This must be a part of the IPC structure */
-    uint16_t    intr_mask; /* This must be a part of the IPC structure */
+    uint8_t         client_id; /* This must be a part of the IPC structure */
+    uint16_t        intr_mask; /* This must be a part of the IPC structure */
     ipc_payload_t   payload;
 } ipc_msg_t;
 

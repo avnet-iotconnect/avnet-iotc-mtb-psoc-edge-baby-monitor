@@ -318,6 +318,20 @@ static void on_connection_status(IotConnectConnectionStatus status) {
     }
 }
 
+static void on_ota(IotclC2dEventData data) {
+    const char *ota_host = iotcl_c2d_get_ota_url_hostname(data, 0);
+    if (ota_host == NULL){
+        printf("OTA host is invalid.\n");
+        return;
+    }
+    const char *ota_path = iotcl_c2d_get_ota_url_resource(data, 0);
+    if (ota_path == NULL) {
+        printf("OTA resource is invalid.\n");
+        return;
+    }
+    printf("OTA download request received for https://%s%s, but it is not implemented.\n", ota_host, ota_path);
+}
+
 // returns success on matching the expected format. Returns is_on, assuming "on" for true, "off" for false
 static bool parse_on_off_command(const char* command, const char* name, bool *arg_parsing_success, bool *is_on, const char** message) {
     *arg_parsing_success = false;
@@ -351,7 +365,6 @@ static bool parse_on_off_command(const char* command, const char* name, bool *ar
 static void on_command(IotclC2dEventData data) {
     const char * const BOARD_STATUS_LED = "board-user-led";
     const char * const DEMO_MODE_CMD = "demo-mode";
-    const char * const SET_DETECTION_THRESHOLD = "set-detection-threshold "; // with a space
     const char * const SET_REPORTING_INTERVAL = "set-reporting-interval "; // with a space
 
     bool command_success = false;
@@ -430,11 +443,9 @@ static cy_rslt_t publish_telemetry(void) {
 void app_task(void *pvParameters) {
     (void) pvParameters;
     
-    //E84 need it
+    //E84 needs this for WiFi
     app_sdio_init();
  
-    /* \x1b[2J\x1b[;H - ANSI ESC sequence to clear screen. */
-    // printf("\x1b[2J\x1b[;H");
     printf("===============================================================\n");
     printf("Starting The App Task\n");
     printf("===============================================================\n\n");
@@ -449,13 +460,11 @@ void app_task(void *pvParameters) {
     char iotc_duid[IOTCL_CONFIG_DUID_MAX_LEN] = {0};
     sprintf(iotc_duid, IOTCONNECT_DUID_PREFIX"%08lx", (unsigned long) hwuidhi);
 
-    printf("TEMP device unique ID (DUID) is: %s\n", iotc_duid);
+    printf("Generated device unique ID (DUID) is: %s\n", iotc_duid);
 
-    if (strlen(CLIENT_CERTIFICATE) > 0) {
-    	printf("device certificate is in place.\n");
-    }
-    else {
-		printf("device certificate is missing.\n");
+    if (strlen(IOTCONNECT_DEVICE_CERT) == 0) {
+		printf("Device certificate is missing.\n");
+        while (1) { taskYIELD(); }
 	}
 
     IotConnectClientConfig config;
@@ -466,10 +475,11 @@ void app_task(void *pvParameters) {
     config.duid = iotc_duid;
     config.qos = 1;
     config.verbose = true;
-    config.x509_config.device_cert = CLIENT_CERTIFICATE;
-    config.x509_config.device_key = CLIENT_PRIVATE_KEY;
+    config.x509_config.device_cert = IOTCONNECT_DEVICE_CERT;
+    config.x509_config.device_key = IOTCONNECT_DEVICE_CERT;
     config.callbacks.status_cb = on_connection_status;
     config.callbacks.cmd_cb = on_command;
+    config.callbacks.ota_cb = on_ota;
 
     const char * conn_type_str = "(UNKNOWN)";
     if (config.connection_type == IOTC_CT_AWS) {
@@ -483,8 +493,7 @@ void app_task(void *pvParameters) {
     printf("DUID: %s\n", config.duid);
     printf("CPID: %s\n", config.cpid);
     printf("ENV: %s\n", config.env);
-    
-    
+
     //WIFI CONNECT
     /* Configure the Wi-Fi interface as a Wi-Fi STA (i.e. Client). */
     wcm_config.interface = CY_WCM_INTERFACE_TYPE_STA;

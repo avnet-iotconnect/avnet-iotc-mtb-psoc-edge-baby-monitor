@@ -38,6 +38,10 @@
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
+/* SPDX-License-Identifier: MIT
+ * Copyright (C) 2025 Avnet
+ * Authors: Nikola Markovic <nikola.markovic@avnet.com>, Shu Liu <shu.liu@avnet.com> et al.
+ */
 
 #ifndef SOURCE_IPC_COMMUNICATION_H
 #define SOURCE_IPC_COMMUNICATION_H
@@ -78,12 +82,6 @@
 
 /* Combined Interrupt Mask */
 #define CY_IPC_CYPIPE_INTR_MASK         ( CY_IPC_CYPIPE_CHAN_MASK_EP1 | CY_IPC_CYPIPE_CHAN_MASK_EP2)
-
-/* Command messages sent from CM55 to CM33 */
-#define IPC_CMD_INIT                    (0x81)
-#define IPC_CMD_START                   (0x82)
-#define IPC_CMD_STOP                    (0x83)
-#define IPC_CMD_STATUS                  (0x41)
 
 /*******************************************************************************
 * Enumeration

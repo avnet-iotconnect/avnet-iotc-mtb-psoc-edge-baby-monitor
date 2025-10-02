@@ -426,7 +426,7 @@ static void on_command(IotclC2dEventData data) {
 
 static cy_rslt_t publish_telemetry(void) {
     ipc_payload_t payload;
-    // useful fro debugging - maning sure we have te latest data:
+    // useful fro debugging - making sure we have te latest data:
     // printf("Has IPC Data: %s\n", cm33_ipc_has_received_message() ? "true" : "false");
     cm33_ipc_safe_copy_last_payload(&payload);
     IotclMessageHandle msg = iotcl_telemetry_create();

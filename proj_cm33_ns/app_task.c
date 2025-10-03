@@ -526,7 +526,7 @@ void app_task(void *pvParameters) {
 
     cy_rslt_t ret = iotconnect_sdk_init(&config);
     if (CY_RSLT_SUCCESS != ret) {
-        printf("Failed to initialize the IoTConnect SDK. Error code: %lu\n", ret);
+        printf("Failed to initialize the IoTConnect SDK. Error code: %u\n", (unsigned int) ret);
         goto exit_cleanup;
     }
 
@@ -534,7 +534,7 @@ void app_task(void *pvParameters) {
     for (int i = 0; i < 10; i++) {
         ret = iotconnect_sdk_connect();
         if (CY_RSLT_SUCCESS != ret) {
-            printf("Failed to initialize the IoTConnect SDK. Error code: %lu\n", ret);
+            printf("Failed to initialize the IoTConnect SDK. Error code: %u\n", (unsigned int) ret);
             goto exit_cleanup;
         }
         

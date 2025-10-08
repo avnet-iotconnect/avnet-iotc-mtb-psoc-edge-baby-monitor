@@ -75,9 +75,6 @@
 
 static mtb_hal_lptimer_t lptimer_obj;
 
-uint32_t cry_detect = 0;
-volatile uint8_t data_refresh_flag = 0;
-
 /*****************************************************************************
  * Function Definitions
  *****************************************************************************/

@@ -1,4 +1,4 @@
-## Avnet PSOC™ Edge DEEPCRAFT™ Ready Models
+## Avnet PSOC™ Edge DEEPCRAFT™ Baby Monitor
 
 This demo project is the integration of Infineon's 
 [PSOC&trade; Edge MCU: Machine learning – DEEPCRAFT™ deploy audio](https://github.com/Infineon/mtb-example-psoc-edge-ml-deepcraft-deploy-audio/tree/release-v2.1.0)

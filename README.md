@@ -47,34 +47,16 @@ Ensure the following jumper and pin configuration on board.
 To setup the project, please refer to the 
 [/IOTCONNECT ModusToolbox&trade; PSOC Edge Developer Guide](DEVELOPER_GUIDE.md)
 
-- To select the model, update the `MODEL_SELECTION` variable in the *Makefile* of proj_cm55 project.
-
-| Model name                  | Macro                       |
-|:----------------------------|:----------------------------|
-| Cough detection             | `COUGH_MODEL`               |
-| Alarm detection             | `ALARM_MODEL`               |
-| Baby cry detection          | `BABYCRY_MODEL`             |
-| Gesture detection           | `GESTURE_MODEL`             |
-| Directio of Arrival (Sound) | `DIRECTIONOFARRIVAL_MODEL`  |
-| Fall detection              | `FALLDETECTION_MODEL`       |
+## Running the Demo
 
 - Once the board connects to /IOTCONNECT, 
 it will start processing microphone input and attempt to detect the corresponding sound. 
-This can be tested by placing the board in such way so that the microphone close to the PC speaker.
+This can be tested by placing the board in such way so that the microphone close to the PC speaker. Observe if the model detects and reports the correct baby cry sound.
 
 
 - The following YouTube sound clips can be used for testing:
   * [Baby Cry](https://www.youtube.com/watch?v=Rwj1_eWltJQ&t=227s)
 
-- For Gesture detection model, if having issues with detections, 
-place the kit at a distance of approximately 60 cms away from you,
-for the gestures to be detected correctly. 
-See the original Infineon project github page for more details on how to perform gestures:
-    * Push
-    * Swipe Up
-    * Swipe Down
-    * Swipe Left
-    * Swipe Right
 
 - After a few seconds, the device will begin sending telemetry packets similar to the example below:
 ```

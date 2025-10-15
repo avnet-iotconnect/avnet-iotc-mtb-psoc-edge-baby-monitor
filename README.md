@@ -1,6 +1,7 @@
-## Avnet PSOC™ Edge DEEPCRAFT™ Baby Monitor
+## Avnet PSOC™ Edge DEEPCRAFT™ Ready Models
 
-This demo project is the integration of Infineon's [PSOC&trade; Edge MCU: Machine learning – DEEPCRAFT™ deploy audio](https://github.com/Infineon/mtb-example-psoc-edge-ml-deepcraft-deploy-audio/tree/master)
+This demo project is the integration of Infineon's 
+[PSOC&trade; Edge MCU: Machine learning – DEEPCRAFT™ deploy audio](https://github.com/Infineon/mtb-example-psoc-edge-ml-deepcraft-deploy-audio/tree/release-v2.1.0)
 and [Avnet /IOTCONNECT ModusToolbox&trade; SDK](https://github.com/avnet-iotconnect/avnet-iotc-mtb-sdk). 
 
 This code example demonstrates how to deploy a machine learning (ML) model to detect audio generated using DEEPCRAFT&trade; Studio on Infineon's PSOC&trade; Edge MCU.
@@ -8,6 +9,11 @@ This code example demonstrates how to deploy a machine learning (ML) model to de
 This example deploys DEEPCRAFT&trade; Studio's baby cry detection starter model on the PSOC&trade; Edge MCU. This model uses data from the pulse-density modulation to detect whether a baby is crying or not.
 
 This project has a three project structure: CM33 secure, CM33 non-secure, and CM55 projects. All three projects are programmed to the external QSPI flash and executed in Execute in Place (XIP) mode. Extended boot launches the CM33 secure project from a fixed location in the external flash, which then configures the protection settings and launches the CM33 non-secure application. Additionally, CM33 non-secure application enables CM55 CPU and launches the CM55 application.
+
+The M55 processor performs the DEEPCRAFT™ model heavy lifting and reports the data via IPC to the M33 processor.
+The M33 Non-Secure application is a custom /IOTCONNECT application that is receiving the IPC messages, 
+processing the data and sending it to /IOTCONNECT. 
+This application can receive Cloud-To-Device commands as well and control one of the board LEDs or control the application flow.    
 
 ## Requirements
 
@@ -36,30 +42,47 @@ Ensure the following jumper and pin configuration on board.
 
 > **Note:** This hardware setup is not required for KIT_PSE84_AI.
 
-## Setup the Project
+## Setup The Project
 
-- To setup the project, please refer to the 
-[/IOTCONNECT ModusToolbox&trade; PSOC Edge Developer Guide](DEVELOPER_GUIDE.md).
+To setup the project, please refer to the 
+[/IOTCONNECT ModusToolbox&trade; PSOC Edge Developer Guide](DEVELOPER_GUIDE.md)
 
-## Running the Demo
+- To select the model, update the `MODEL_SELECTION` variable in the *Makefile* of proj_cm55 project.
+
+| Model name                  | Macro                       |
+|:----------------------------|:----------------------------|
+| Cough detection             | `COUGH_MODEL`               |
+| Alarm detection             | `ALARM_MODEL`               |
+| Baby cry detection          | `BABYCRY_MODEL`             |
+| Gesture detection           | `GESTURE_MODEL`             |
+| Directio of Arrival (Sound) | `DIRECTIONOFARRIVAL_MODEL`  |
+| Fall detection              | `FALLDETECTION_MODEL`       |
 
 - Once the board connects to /IOTCONNECT, 
 it will start processing microphone input and attempt to detect the corresponding sound. 
-This can be tested by placing the board in such way so that the microphone close to the PC speaker. Observe if the model detects and reports the correct baby cry sound.
+This can be tested by placing the board in such way so that the microphone close to the PC speaker.
 
 
 - The following YouTube sound clips can be used for testing:
   * [Baby Cry](https://www.youtube.com/watch?v=Rwj1_eWltJQ&t=227s)
 
+- For Gesture detection model, if having issues with detections, 
+place the kit at a distance of approximately 60 cms away from you,
+for the gestures to be detected correctly. 
+See the original Infineon project github page for more details on how to perform gestures:
+    * Push
+    * Swipe Up
+    * Swipe Down
+    * Swipe Left
+    * Swipe Right
 
 - After a few seconds, the device will begin sending telemetry packets similar to the example below:
 ```
->: {"d":[{"d":{"version":"1.0.0","random":32,"baby_cry_detected":"true"}}]}
+>: {"d":[{"d":{"version":"1.1.0","random":32,"confidence":86,"class_id":2,"class":"baby_cry","event_detected":true}}]}
 ```
 - The following commands can be sent to the device using the /IOTCONNECT Web UI:
 
-    | Command                  | Argument Type     | Description                                                                                                                                                                 |
+    | Command                  | Argument Type     | Description                                                        |
     |:-------------------------|-------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | `board-user-led`         | String (on/off)   | Turn the board LED on or off                                                                                                                                                |
     | `set-reporting-interval` | Number (eg. 2000) | Set telemetry reporting interval in milliseconds.  By default, the application will report every 2000ms                                     |
-          

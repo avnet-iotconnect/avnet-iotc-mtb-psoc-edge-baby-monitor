@@ -7,8 +7,8 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2024-2025, Cypress Semiconductor Corporation (an Infineon company)
-# SPDX-License-Identifier: Apache-2.0
+# (c) 2025, Infineon Technologies AG, or an affiliate of Infineon
+# Technologies AG.  SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ include ../common.mk
 # Basic Configuration
 ################################################################################
 
-
 # Name of application (used to derive name of final linked file).
 #
 # If APPNAME is edited, ensure to update or regenerate launch
@@ -42,7 +41,7 @@ VERBOSE=
 # Neural Network Configuration. Options include
 #
 # float    -- floating point for the input data and weights
-# int8x8   -- 8-bit fixed-point for the input data and weights
+# int8x8   -- 8-bit fixed-point for the input data and weights (this is supported by default)
 NN_TYPE=int8x8
 
 # Choose the inference engine
@@ -82,7 +81,6 @@ SOURCES+=$(wildcard ../shared/source/COMPONENT_CM55/*.c)
 # Like SOURCES, but for include directories. Value should be paths to
 # directories (without a leading -I).
 INCLUDES+=../shared/include
-#INCLUDES+=../Models/COMPONENT_CM55
 
 # Add additional defines to the build process (without a leading -D).
 DEFINES+=CY_RETARGET_IO_CONVERT_LF_TO_CRLF
@@ -153,6 +151,11 @@ PREBUILD=
 # Custom post-build commands to run.
 POSTBUILD=
 
+# Ignore the cm55 source files when CPU is cm33
+ifeq ($(ML_DEEPCRAFT_CPU),cm33)
+CY_IGNORE+=./model/model.c
+CY_IGNORE+=./audio.c
+endif
 
 ################################################################################
 # Paths
@@ -176,11 +179,5 @@ CY_GETLIBS_SHARED_PATH=../..
 # Directory name of the shared repo location.
 #
 CY_GETLIBS_SHARED_NAME=mtb_shared
-
-# Absolute path to the compiler's "bin" directory.
-#
-# The default depends on the selected TOOLCHAIN (GCC_ARM uses the ModusToolbox
-# software provided compiler by default).
-CY_COMPILER_PATH?=
 
 include $(CY_TOOLS_DIR)/make/start.mk

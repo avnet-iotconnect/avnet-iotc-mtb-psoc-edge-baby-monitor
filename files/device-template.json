@@ -16,7 +16,25 @@
             "unit": null
         },
 		{
-            "name": "baby_cry_detected",
+            "name": "class_id",
+            "type": "INTEGER",
+            "description": "Detected class numeric index",
+            "unit": null
+        },
+		{
+            "name": "confidence",
+            "type": "INTEGER",
+            "description": "Detection (or non-detection) confidence as percentage",
+            "unit": null
+        },
+		{
+            "name": "class",
+            "type": "STRING",
+            "description": "Detected class name",
+            "unit": null
+        },
+		{
+            "name": "event_detected",
             "type": "BOOLEAN",
             "description": "Detected true when an actual event has been detected",
             "unit": null

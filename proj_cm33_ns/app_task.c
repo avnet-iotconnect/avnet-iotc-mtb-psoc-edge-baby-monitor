@@ -24,7 +24,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#define APP_VERSION		"1.1.0"
+#define APP_VERSION		"1.1.1"
 
 static bool is_demo_mode = false;
 static int reporting_interval = 2000;

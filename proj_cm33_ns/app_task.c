@@ -17,10 +17,12 @@
 #include "wifi_app.h"
 
 #include "iotconnect.h"
+#include "iotc_mtb_time.h"
 
 #include "app_config.h"
 
 
+/////////////////////////////////////////////////////////////////////////////
 
 #define APP_VERSION		"1.1.0"
 
@@ -46,7 +48,7 @@ static void on_connection_status(IotConnectConnectionStatus status) {
 
 static void on_ota(IotclC2dEventData data) {
     const char *ota_host = iotcl_c2d_get_ota_url_hostname(data, 0);
-    if (ota_host == NULL){
+    if (ota_host == NULL) {
         printf("OTA host is invalid.\n");
         return;
     }
@@ -222,6 +224,8 @@ void app_task(void *pvParameters) {
 
     // This will not return if it fails
     wifi_app_connect();
+
+    iotc_mtb_time_obtain(IOTCONNECT_SNTP_SERVER);
 
     cy_rslt_t ret = iotconnect_sdk_init(&config);
     if (CY_RSLT_SUCCESS != ret) {

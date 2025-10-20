@@ -60,7 +60,7 @@ This can be tested by placing the board in such way so that the microphone close
 
 - After a few seconds, the device will begin sending telemetry packets similar to the example below:
 ```
->: {"d":[{"d":{"version":"1.1.0","random":32,"confidence":86,"class_id":2,"class":"baby_cry","event_detected":true}}]}
+>: {"d":[{"d":{"version":"1.1.1","random":32,"confidence":86,"class_id":2,"class":"baby_cry","event_detected":true}}]}
 ```
 - The following commands can be sent to the device using the /IOTCONNECT Web UI:
 

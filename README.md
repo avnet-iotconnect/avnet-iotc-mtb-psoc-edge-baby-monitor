@@ -64,7 +64,7 @@ This can be tested by placing the board in such way so that the microphone close
 ```
 - The following commands can be sent to the device using the /IOTCONNECT Web UI:
 
-    | Command                  | Argument Type     | Description                                                        |
-    |:-------------------------|-------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | `board-user-led`         | String (on/off)   | Turn the board LED on or off                                                                                                                                                |
-    | `set-reporting-interval` | Number (eg. 2000) | Set telemetry reporting interval in milliseconds.  By default, the application will report every 2000ms                                     |
+    | Command                  | Argument Type     | Description                                                                                             |
+    |:-------------------------|-------------------|:--------------------------------------------------------------------------------------------------------|
+    | `board-user-led`         | String (on/off)   | Turn the board LED on or off  (Red LED on the EVK, Green on the AI)                                     |
+    | `set-reporting-interval` | Number (eg. 2000) | Set telemetry reporting interval in milliseconds.  By default, the application will report every 2000ms |

@@ -36,20 +36,9 @@ This application can receive Cloud-To-Device commands as well and control one of
 - [PSOC&trade; Edge E84 Evaluation Kit](https://www.infineon.com/KIT_PSE84_EVAL) (`KIT_PSE84_EVAL_EPC2`) -
 [Purchase Link](https://www.newark.com/infineon/kitpse84evaltobo1/eval-kit-32bit-arm-cortex-m55f/dp/49AM4460)
 
-## Hardware setup
+## Set Up The Project
 
-This example uses the board's default configuration. 
-See the kit user guide to ensure that the board is configured correctly.
-
-Ensure the following jumper and pin configuration on board.
-- BOOT SW must be in the HIGH/ON position
-- J20 and J21 must be in the tristate/not connected (NC) position
-
-> **Note:** This hardware setup is not required for KIT_PSE84_AI.
-
-## Setup The Project
-
-To setup the project, please refer to the 
+To set up the project, please refer to the 
 [/IOTCONNECT ModusToolbox&trade; PSOC Edge Developer Guide](DEVELOPER_GUIDE.md)
 
 ## Running the Demo

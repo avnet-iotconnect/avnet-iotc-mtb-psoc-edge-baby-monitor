@@ -9,9 +9,9 @@
 #include "iotconnect.h"
 
 // see IotConnectConnectionType: IOTC_CT_AWS or IOTC_CT_AZURE
-#define IOTCONNECT_CONNECTION_TYPE IOTC_CT_UNDEFINED
-#define IOTCONNECT_CPID "your-cpid"
-#define IOTCONNECT_ENV  "your-env"
+#define IOTCONNECT_CONNECTION_TYPE IOTC_CT_AWS
+#define IOTCONNECT_CPID ""
+#define IOTCONNECT_ENV  ""
 
 // If Device Unique ID (DUID) is not provided, a generated DUID will be used using the below prefix
 #define IOTCONNECT_DUID ""

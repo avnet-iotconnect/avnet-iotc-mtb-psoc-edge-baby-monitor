@@ -1,5 +1,5 @@
 /**
- * \file mbedtls_user_config.h
+ * \file config.h
  *
  * \brief Configuration options (set of defines)
  *
@@ -29,10 +29,14 @@
 #ifndef MBEDTLS_USER_CONFIG_HEADER
 #define MBEDTLS_USER_CONFIG_HEADER
 
+#if !defined(COMPONENT_4390X)
+#include "cy_syslib.h"
+#endif
+
 /**
- * Compiling Mbed TLS for Cortex-M0/0+/1/M23 cores with optimization enabled and on ARMC6 compiler results in errors.
+ * Compiling Mbed TLS for Cortex-M0/0+/1/M23 cores with optimization enabled and on ARMC6 compiler results in errors. 
  * These cores lack the required full Thumb-2 support, causing the inline assembly to require more registers than available.
- * The workaround is to use 'MULADDC_CANNOT_USE_R7' compilation flag, or without optimization flag,
+ * The workaround is to use 'MULADDC_CANNOT_USE_R7' compilation flag, or without optimization flag, 
  * but note that this will compile without the assmebly optimization.
  *
  * To read more about this issue, refer to https://github.com/ARMmbed/mbed-os/pull/14529/commits/86e7bc559b0d1a055bf84ea9249763d2349fb6e8
@@ -68,7 +72,7 @@
  * mbedtls_platform_gmtime_r() at compile-time by using the macro
  * MBEDTLS_PLATFORM_GMTIME_R_ALT.
  */
-// #undef MBEDTLS_HAVE_TIME_DATE
+#undef MBEDTLS_HAVE_TIME_DATE
 
 
 /**
@@ -133,7 +137,7 @@
 #undef MBEDTLS_ECP_DP_BP256R1_ENABLED
 #undef MBEDTLS_ECP_DP_BP384R1_ENABLED
 #undef MBEDTLS_ECP_DP_BP512R1_ENABLED
-#undef MBEDTLS_ECP_DP_CURVE25519_ENABLED
+//#undef MBEDTLS_ECP_DP_CURVE25519_ENABLED
 #undef MBEDTLS_ECP_DP_CURVE448_ENABLED
 
 /**
@@ -203,35 +207,6 @@
  * MBEDTLS_SHA512_C are defined. Otherwise the available hash module is used.
  */
 #define MBEDTLS_ENTROPY_FORCE_SHA256
-
-/*
- * \def MBEDTLS_SSL_SRV_C
- *
- * Enables server option in device
- *
- * Comment this macro to support server
- */
-#undef MBEDTLS_SSL_SRV_C
-/*
- * \def MBEDTLS_CHACHA20_C
- * \def MBEDTLS_CHACHAPOLY_C
- * \def MBEDTLS_POLY1305_C
- *
- * Enable support of CHACHA20 and CHACHAPOLY algorithm.
- */
-#undef MBEDTLS_CHACHA20_C
-
-#undef MBEDTLS_CHACHAPOLY_C
-
-#undef MBEDTLS_POLY1305_C
-
-/*
- * \def MBEDTLS_CAMELLIA_C
- *
- * Enable to support camellia cipher suites.
- */
-#undef MBEDTLS_CAMELLIA_C
-
 
 /**
  * \def MBEDTLS_SELF_TEST
@@ -571,7 +546,7 @@
  *
  * This module is the basis for creating X.509 certificates and CSRs.
  */
-// #undef MBEDTLS_X509_CREATE_C
+#undef MBEDTLS_X509_CREATE_C
 
 /**
  * \def MBEDTLS_X509_CSR_WRITE_C
@@ -597,7 +572,7 @@
  *
  * This module is required for X.509 certificate creation.
  */
-// #undef MBEDTLS_X509_CRT_WRITE_C
+#undef MBEDTLS_X509_CRT_WRITE_C
 
 /**
  * \def MBEDTLS_CERTS_C
@@ -820,7 +795,7 @@
  *
  * Uncomment this macro to enable the support for TLS 1.3.
  */
-#define MBEDTLS_SSL_PROTO_TLS1_3
+//#define MBEDTLS_SSL_PROTO_TLS1_3
 
 #ifndef MBEDTLS_SSL_PROTO_TLS1_3
 /**
@@ -940,7 +915,7 @@
  */
 #define MBEDTLS_VERBOSE 0
 
-/**
+/** 
  * \def Comment out below line in addition to setting MBEDTLS_VERBOSE value to get the MBEDTLS logs
  *
  * MBEDTLS_DEBUG_C flag is by default undefined to save code space (~60Kb). For low memory platform, when MBEDTLS_DEBUG_C is enabled
@@ -984,6 +959,74 @@
  */
 #define FORCE_TLS_VERSION MBEDTLS_SSL_VERSION_TLS1_3
 
+/* Platform time alt */
+#define MBEDTLS_PLATFORM_MS_TIME_ALT
+
+/* If Dcache is not present then enable PSA crypto configurations */
+#if defined (CY_DISABLE_XMC7000_DATA_CACHE) || !( defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U) )
+
+/* Enable MXCRYPTO PSA driver */
+#define IFX_PSA_MXCRYPTO_PRESENT
+#define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#define MBEDTLS_PSA_CRYPTO_DRIVERS
+/**
+ * \def MBEDTLS_USE_PSA_CRYPTO
+ *
+ * Make the X.509 and TLS library use PSA for cryptographic operations, and
+ * enable new APIs for using keys handled by PSA Crypto.
+ *
+ * \note Development of this option is currently in progress, and parts of Mbed
+ * TLS's X.509 and TLS modules are not ported to PSA yet. However, these parts
+ * will still continue to work as usual, so enabling this option should not
+ * break backwards compatibility.
+ *
+ * \note See docs/use-psa-crypto.md for a complete description of what this
+ * option currently does, and of parts that are not affected by it so far.
+ *
+ * \warning If you enable this option, you need to call `psa_crypto_init()`
+ * before calling any function from the SSL/TLS, X.509 or PK modules.
+ *
+ * Requires: MBEDTLS_PSA_CRYPTO_C.
+ *
+ * Uncomment this to enable internal use of PSA Crypto and new associated APIs.
+ */
+#define MBEDTLS_USE_PSA_CRYPTO
+
+/**
+ * \def MBEDTLS_PSA_CRYPTO_CONFIG
+ *
+ * This setting allows support for cryptographic mechanisms through the PSA
+ * API to be configured separately from support through the mbedtls API.
+ *
+ * When this option is disabled, the PSA API exposes the cryptographic
+ * mechanisms that can be implemented on top of the `mbedtls_xxx` API
+ * configured with `MBEDTLS_XXX` symbols.
+ *
+ * When this option is enabled, the PSA API exposes the cryptographic
+ * mechanisms requested by the `PSA_WANT_XXX` symbols defined in
+ * include/psa/crypto_config.h. The corresponding `MBEDTLS_XXX` settings are
+ * automatically enabled if required (i.e. if no PSA driver provides the
+ * mechanism). You may still freely enable additional `MBEDTLS_XXX` symbols
+ * in mbedtls_config.h.
+ *
+ * If the symbol #MBEDTLS_PSA_CRYPTO_CONFIG_FILE is defined, it specifies
+ * an alternative header to include instead of include/psa/crypto_config.h.
+ *
+ * This feature is still experimental and is not ready for production since
+ * it is not completed.
+ */
+#define MBEDTLS_PSA_CRYPTO_CONFIG
+#endif
+
+#if !defined (CY_DISABLE_XMC7000_DATA_CACHE) && defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+/*
+ * Disable MBEDTLS hardware acceleration for ARM, IAR and llvm toolchains.
+ */
+#if defined(__ARMCC_VERSION) || defined(__IAR_SYSTEMS_ICC__) || defined(__llvm__)
+#define DISABLE_MBEDTLS_ACCELERATION
+#endif
+#endif
+
 /**
  * \def Enable alternate crypto implementations to use the hardware
  *      acceleration. Include The hardware acceleration module's (cy-mbedtls-acceleration)
@@ -992,24 +1035,87 @@
 #ifndef DISABLE_MBEDTLS_ACCELERATION
 #include "mbedtls_alt_config.h"
 
+/* MBEDTLS defines for Dcache supported platforms */
+#if !defined (CY_DISABLE_XMC7000_DATA_CACHE) && defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+/**
+ * \def MBEDTLS_PLATFORM_MEMORY
+ *
+ * Enable the memory allocation layer.
+ *
+ * By default mbed TLS uses the system-provided calloc() and free().
+ * This allows different allocators (self-implemented or provided) to be
+ * provided to the platform abstraction layer.
+ *
+ * Enabling MBEDTLS_PLATFORM_MEMORY without the
+ * MBEDTLS_PLATFORM_{FREE,CALLOC}_MACROs will provide
+ * "mbedtls_platform_set_calloc_free()" allowing you to set an alternative calloc() and
+ * free() function pointer at runtime.
+ *
+ * Enabling MBEDTLS_PLATFORM_MEMORY and specifying
+ * MBEDTLS_PLATFORM_{CALLOC,FREE}_MACROs will allow you to specify the
+ * alternate function at compile time.
+ *
+ * Requires: MBEDTLS_PLATFORM_C
+ *
+ * Enable this layer to allow use of alternative memory allocators.
+ */
+#define MBEDTLS_PLATFORM_MEMORY
+
+/**
+ * \def MBEDTLS_MEMORY_BUFFER_ALLOC_C
+ *
+ * Enable the buffer allocator implementation that makes use of a (stack)
+ * based buffer to 'allocate' dynamic memory. (replaces calloc() and free()
+ * calls)
+ *
+ * Module:  library/memory_buffer_alloc.c
+ *
+ * Requires: MBEDTLS_PLATFORM_C
+ *           MBEDTLS_PLATFORM_MEMORY (to use it within mbed TLS)
+ *
+ * Enable this module to enable the buffer memory allocator.
+ */
+#define MBEDTLS_MEMORY_BUFFER_ALLOC_C
+
+/**
+ * \def MBEDTLS_THREADING_ALT
+ *
+ * Provide your own alternate threading implementation.
+ *
+ * Requires: MBEDTLS_THREADING_C
+ *
+ * Uncomment this to allow your own alternate threading implementation.
+ */
+#define MBEDTLS_THREADING_ALT
+
+/**
+ * \def MBEDTLS_THREADING_C
+ *
+ * Enable the threading abstraction layer.
+ * By default mbed TLS assumes it is used in a non-threaded environment or that
+ * contexts are not shared between threads. If you do intend to use contexts
+ * between threads, you will need to enable this layer to prevent race
+ * conditions. See also our Knowledge Base article about threading:
+ * https://mbed-tls.readthedocs.io/en/latest/kb/development/thread-safety-and-multi-threading
+ *
+ * Module:  library/threading.c
+ *
+ * This allows different threading implementations (self-implemented or
+ * provided).
+ *
+ * You will have to enable either MBEDTLS_THREADING_ALT or
+ * MBEDTLS_THREADING_PTHREAD.
+ *
+ * Enable this layer to allow use of mutexes within mbed TLS
+ */
+#define MBEDTLS_THREADING_C
+
+#endif
 /**
  * The cy-mbedtls-acceleration module supports only DP_SECP192R1,
  * SECP224R1, SECP256R1, SECP384R1 and SECP521R1 curves. If any
  * other curve is enabled, need to disable the MBEDTLS_ECP_ALT.
  */
-
-/**
- * Nik: Looking at the comments, it would appear that SECP256R1 should be hardware accelerated,
- * but when we try to hook into it, the board freezes when printing the mbedtls generated certificates
- * we must disable it for now and research further.
-#ifdef MBEDTLS_ECP_DP_SECP256R1_ENABLED
-#undef MBEDTLS_ECP_ALT
-#undef MBEDTLS_ECDH_GEN_PUBLIC_ALT
-#undef MBEDTLS_ECDSA_SIGN_ALT
-#undef MBEDTLS_ECDSA_VERIFY_ALT
-#endif
- */
-
 #ifdef MBEDTLS_ECP_DP_SECP192K1_ENABLED
 #undef MBEDTLS_ECP_ALT
 #undef MBEDTLS_ECDH_GEN_PUBLIC_ALT

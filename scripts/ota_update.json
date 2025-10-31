@@ -1,0 +1,13 @@
+{
+  "Message":"Update Available",
+  "Manufacturer":"Infineon",
+  "ManufacturerId":"IFX",
+  "Product":"PSOC EDGE",
+  "SerialNumber":"ABC213450001",
+  "Version":"1.1.0",
+  "Board":"APP_KIT_PSE84_EVAL_EPC2",
+  "Connection":"HTTPS",
+  "Server":"192.168.0.102",
+  "Port":"50007",
+  "File":"/ota-update.tar"
+}

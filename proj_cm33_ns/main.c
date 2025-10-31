@@ -50,6 +50,10 @@
 #include "cycfg_peripherals.h"
 #include "ipc_communication.h"
 
+/* OTA storage api */
+#include "cy_ota_storage_api.h"
+#include "cy_log.h"
+
 /******************************************************************************
  * Macros
  ******************************************************************************/
@@ -181,10 +185,19 @@ static void setup_tickless_idle_timer(void)
  *
  ******************************************************************************/
 
+/* This enables RTOS aware debugging.
+ * OpenOCD makes use of uxTopUsedPriority for thread debugging. Prevent uxTopUsedPriority
+ * from getting optimized out as it is no longer used by the kernel.
+ */
+volatile int  __attribute__((used)) uxTopUsedPriority;
+
 int main(void)
 {
     cy_rslt_t result;
     rtc_type obj;
+
+    /* This enables RTOS aware debugging in OpenOCD. */
+    uxTopUsedPriority = configMAX_PRIORITIES - 1; 
         
     /* Initialize the board support package. */
     
@@ -206,9 +219,17 @@ int main(void)
     /* Initialize rtc */
     Cy_RTC_Init(&CYBSP_RTC_config);
     Cy_RTC_SetDateAndTime(&CYBSP_RTC_config);
+
     
     /* Initialize the CLIB support library */
     mtb_clib_support_init(&obj);
+
+    /* default for all logging to WARNING */
+    cy_log_init(CY_LOG_INFO, NULL, NULL);
+
+    /* default for OTA logging to NOTICE */
+    //cy_ota_set_log_level(CY_LOG_INFO);
+	cy_ota_set_log_level(CY_LOG_INFO);
     
     /* Setup IPC communication for CM33 */
     cm33_ipc_communication_setup();
